@@ -1,0 +1,10 @@
+name: Docker build image
+
+on:
+  pull_request:
+    types: [ opened, synchronize ]
+  workflow_dispatch:
+
+jobs:
+  Build:
+    uses: THD-C/GH_Actions/.github/workflows/build-docker.yml@main
