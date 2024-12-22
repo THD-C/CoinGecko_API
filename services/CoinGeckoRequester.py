@@ -1,20 +1,61 @@
-import json
-from os import getenv
-import time
+import os
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-class Cacher:
-    def __init__(self):
-        url = 'https://api.coingecko.com/api/v3/coins/list'
+class CoinGeckoRequester:
+    _instance = None
 
-        headers = {'x-cg-demo-api-key': getenv('COINGECKO_API_KEY')}
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(CoinGeckoRequester, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
 
-        response = requests.get(url)
+    url = 'https://api.coingecko.com/api/v3/coins/'
 
-        if response.status_code == 200:
-            data = response.json()
-            print('works here')
-            with open('cache.txt', 'w') as file:
-                file.write(f"{int(time.time())}\n")
-                json.dump(data, file)
+    headers = {'x-cg-demo-api-key': os.environ.get('COINGECKO_API_KEY')}
+
+    def getCoinData(self, inputData):
+        coin_id = inputData['coin_id']
+
+        url = f"{self.url}/{coin_id}"
+
+        params = {
+            "id": coin_id,
+            'localization': 'false',
+            'tickers': 'false',
+            'community_data': 'false',
+            'developer_data': 'false',
+            'sparkline': 'false'
+        }
+
+        return self.request(url, params)
+
+    def getHistoricalChartData(self, inputData):
+        start_timestamp = inputData['start_date'].ToSeconds()
+        end_timestamp = inputData['end_date'].ToSeconds()
+        coin_id = inputData['coin_id']
+
+        print(start_timestamp, end_timestamp)
+
+        url = f"{self.url}/{coin_id}/market_chart/range"
+
+        params = {
+            "vs_currency": "usd",
+            "from": start_timestamp,
+            "to": end_timestamp
+        }
+
+        return self.request(url, params)
+
+    def request(self, url, params):
+        try:
+            response = requests.get(url, params=params, headers=self.headers)
+            if response.status_code == 200:
+                return {"data": response.json()}
+            else:
+                return {"error": f"Failed to fetch data: {response.status_code} = {response.text}"}
+        except Exception as e:
+            return {"error": str(e)}
