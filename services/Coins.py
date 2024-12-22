@@ -26,7 +26,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
             response = coins.coins_pb2.DataResponse(
                 status="success",
                 error_message="",
-                data=json.dumps(requesterResponse['data'])
+                data=requesterResponse['data']
         )
 
         return response
