@@ -38,8 +38,6 @@ class CoinGeckoRequester:
         end_timestamp = inputData['end_date'].ToSeconds()
         coin_id = inputData['coin_id']
 
-        print(start_timestamp, end_timestamp)
-
         url = f"{self.url}/{coin_id}/market_chart/range"
 
         params = {

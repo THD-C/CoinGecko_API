@@ -1,4 +1,3 @@
-import json
 import coins.coins_pb2
 import coins.coins_pb2_grpc
 from services.CoinGeckoRequester import CoinGeckoRequester
@@ -23,6 +22,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
                 data=""
             )
         else:
+            print(requesterResponse['data'])
             response = coins.coins_pb2.DataResponse(
                 status="success",
                 error_message="",
