@@ -1,0 +1,47 @@
+services:
+  CoinGecko_API:
+      build:
+        dockerfile: Dockerfile
+      image: thd/coin_gecko_api
+      container_name: THD_CoinGecko_API
+      hostname: THD_CoinGecko_API
+      restart: unless-stopped
+      ports:
+        - 50051:50051
+      depends_on:
+        Mongo_Manager:
+          condition: service_started
+
+  Mongo:
+    build:
+      context: https://github.com/THD-C/Mongo.git
+      secrets:
+        - github_token
+    image: thd/mongo
+    container_name: THD_Mongo
+    hostname: Mongo
+    restart: unless-stopped
+    ports:
+      - 27017:27017
+    volumes:
+      - MO-Data:/data/db
+
+  Mongo_Manager:
+    build: https://github.com/THD-C/Mongo_Manager.git
+    image: thd/mongo_manager
+    container_name: THD_Mongo_Manager
+    hostname: Mongo_Manager
+    restart: unless-stopped
+    environment:
+      - MONGO_URL=mongodb://Mongo/THDC
+    ports:
+      - 50052:50051
+    depends_on:
+      Mongo:
+        condition: service_started
+
+secrets:
+  github_token:
+    file: ./.github_token
+volumes:
+  MO-Data:
