@@ -161,5 +161,14 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .idea
+user
+wallet
+order
+transaction
+secret
+password
+payment
 coins
+currency
 cache.txt
+.github_token
