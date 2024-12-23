@@ -1,6 +1,6 @@
 import coins.coins_pb2
 import coins.coins_pb2_grpc
-from services.CoinGeckoRequester import CoinGeckoRequester
+from src.services.CoinGeckoRequester import CoinGeckoRequester
 
 requester = CoinGeckoRequester()
 
