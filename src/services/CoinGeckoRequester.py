@@ -1,4 +1,5 @@
 import requests
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from dotenv import load_dotenv
 
 
@@ -7,6 +8,7 @@ from src.connections import secret_stub
 
 load_dotenv()
 
+RequestsInstrumentor().instrument()
 
 class CoinGeckoRequester:
     _instance = None

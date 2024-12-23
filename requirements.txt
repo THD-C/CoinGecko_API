@@ -11,9 +11,11 @@ opentelemetry-exporter-otlp-proto-common==1.29.0
 opentelemetry-exporter-otlp-proto-grpc==1.29.0
 opentelemetry-instrumentation==0.50b0
 opentelemetry-instrumentation-grpc==0.50b0
+opentelemetry-instrumentation-requests==0.50b0
 opentelemetry-proto==1.29.0
 opentelemetry-sdk==1.29.0
 opentelemetry-semantic-conventions==0.50b0
+opentelemetry-util-http==0.50b0
 packaging==24.2
 prometheus_client==0.21.1
 protobuf==5.29.2
