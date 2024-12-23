@@ -10,7 +10,6 @@ from secret import secret_pb2_grpc
 
 GrpcInstrumentorClient().instrument()
 prometheus_interceptor = PromClientInterceptor()
-start_http_server(8111)
 
 try:
 
