@@ -10,7 +10,7 @@ from py_grpc_prometheus.prometheus_server_interceptor import PromServerIntercept
 from prometheus_client import start_http_server
 
 def serve():
-
+    GrpcInstrumentorServer().instrument()
     server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=10),
         interceptors=[PromServerInterceptor(enable_handling_time_histogram=True)],
