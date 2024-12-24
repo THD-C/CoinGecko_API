@@ -8,6 +8,12 @@ services:
       restart: unless-stopped
       ports:
         - 50051:50051
+      healthcheck:
+        test: ["CMD", "python", "HealthCheck.py"]
+        interval: 30s          
+        timeout: 5s            
+        retries: 3             
+        start_period: 5s 
       depends_on:
         Mongo_Manager:
           condition: service_started
