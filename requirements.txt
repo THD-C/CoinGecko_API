@@ -3,6 +3,7 @@ charset-normalizer==3.4.0
 Deprecated==1.2.15
 googleapis-common-protos==1.66.0
 grpcio==1.68.1
+grpcio-health-checking==1.68.1
 grpcio-reflection==1.68.1
 idna==3.10
 importlib_metadata==8.5.0
