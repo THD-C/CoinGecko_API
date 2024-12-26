@@ -14,9 +14,11 @@ Pobiera, udostępnia na zewnątrz poprzez gRPC, cachuje oraz zarządza danymi z 
 
 ### Paramtery wyjściowe:
 
-    status - status operacji, success lub error
-    error_message - jeśli status=error to opis błędu w przeciwnym wypadku puste
-    data - jeśli status=success to słownik w przeciwnym wypadku puste
+```status``` - status operacji, success lub error
+
+```error_message``` - jeśli status=error to opis błędu w przeciwnym wypadku puste
+
+```data``` - jeśli status=success to słownik w przeciwnym wypadku puste
     
 ### Słownik data z przykładowego response:
 
