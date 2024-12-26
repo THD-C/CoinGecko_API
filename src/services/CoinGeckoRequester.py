@@ -2,7 +2,6 @@ import requests
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from dotenv import load_dotenv
 
-
 from secret.secret_pb2 import SecretName
 from src.connections import secret_stub
 
@@ -44,12 +43,23 @@ class CoinGeckoRequester:
         start_timestamp = inputData["start_date"].ToSeconds()
         end_timestamp = inputData["end_date"].ToSeconds()
         coin_id = inputData["coin_id"]
+        fiat_currency = inputData["fiat_currency"]
 
         url = f"{self.url}/{coin_id}/market_chart/range"
 
-        params = {"vs_currency": "usd", "from": start_timestamp, "to": end_timestamp}
+        params = {
+            "vs_currency": fiat_currency,
+            "from": start_timestamp,
+            "to": end_timestamp
+        }
 
         return self.request(url, params)
+
+    def getAllCoinPrices(self):
+        coin_id = {
+            "coin_id": "btc"
+        }
+        self.getCoinData(coin_id)
 
     def request(self, url, params):
         try:
