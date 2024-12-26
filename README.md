@@ -6,7 +6,7 @@ Pobiera, udostępnia na zewnątrz poprzez gRPC, cachuje oraz zarządza danymi z 
 
 ### Parametry wejściowe:
 
-```coin_id``` - id coina z MongoDB
+```coin_id``` - id crypto coina z MongoDB
 
 ```start_date``` - data startowa jako timestamp
 
@@ -53,8 +53,6 @@ Pierwszy rekord z tabeli timestamp odpowiada pierwszemu rekordowi z tabeli price
 ### Słownik data z przykładowego response:
 
 jako MONGO_FIAT można podstawić dowolną fiatową walutę z MongoDB, np. usd, pln, jpy, etc.
-
-
 
     {
        "id":"bitcoin",
