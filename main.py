@@ -36,6 +36,7 @@ def serve():
     start_http_server(8111)
     server.add_insecure_port("[::]:50051")
     server.start()
+    print("server started")
     server.wait_for_termination()
 
 
