@@ -2,9 +2,9 @@ import requests
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from dotenv import load_dotenv
 
-from currency import currency_pb2, currency_type_pb2
 from secret.secret_pb2 import SecretName
 from src.connections import secret_stub
+from currency import currency_pb2, currency_type_pb2
 from src.connections import currency_stub
 
 load_dotenv()
