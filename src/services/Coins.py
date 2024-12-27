@@ -1,7 +1,6 @@
 import coins.coins_pb2
 import coins.coins_pb2_grpc
 from src.services.CoinGeckoRequester import CoinGeckoRequester
-import currency.currency_pb2 as currency_pb2
 
 requester = CoinGeckoRequester()
 
@@ -20,7 +19,8 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
         if "error" in requesterResponse:
             response = coins.coins_pb2.DataResponse(
                 status="error",
-                error_message=requesterResponse['error'],                data=""
+                error_message=requesterResponse['error'],
+                data=""
             )
         else:
             print("fiat currency:", inputData["fiat_currency"])
@@ -82,8 +82,6 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
         return response
 
     def GetAllCoinsPrices(self, request, context):
-        print(f"Received all coins prices request")
-
         requesterResponse = requester.getAllCoinPrices()
 
         if "error" in requesterResponse:
@@ -93,10 +91,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
                 data=""
             )
         else:
-            formatted_data = {
-
-            }
-
+            formatted_data = requesterResponse['data']
             print(formatted_data)
             response = coins.coins_pb2.DataResponse(
                 status="success",

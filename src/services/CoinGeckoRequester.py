@@ -2,12 +2,15 @@ import requests
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from dotenv import load_dotenv
 
+from currency import currency_pb2, currency_type_pb2
 from secret.secret_pb2 import SecretName
 from src.connections import secret_stub
+from src.connections import currency_stub
 
 load_dotenv()
 
 RequestsInstrumentor().instrument()
+
 
 class CoinGeckoRequester:
     _instance = None
@@ -56,10 +59,20 @@ class CoinGeckoRequester:
         return self.request(url, params)
 
     def getAllCoinPrices(self):
-        coin_id = {
-            "coin_id": "btc"
-        }
-        self.getCoinData(coin_id)
+        CurrencyTypeMsg = currency_pb2.CurrencyTypeMsg(type=currency_type_pb2.CURRENCY_TYPE_CRYPTO)
+        currencies_list = currency_stub.GetSupportedCurrencies(CurrencyTypeMsg)
+        coin_prices = {}
+        i = 0
+        for currency in currencies_list.currencies:
+            i = i + 1
+            if i > 9:
+                continue
+            currency_name = str(currency.currency_name)
+            response = self.getCoinData({"coin_id": currency_name})
+            if "error" in response is not None:
+                return {"error": f"F{response.error}"}
+            coin_prices[currency_name] = response['data']['market_data']['current_price']
+        return {"data": coin_prices}
 
     def request(self, url, params):
         try:
