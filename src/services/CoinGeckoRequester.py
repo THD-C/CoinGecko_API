@@ -65,7 +65,7 @@ class CoinGeckoRequester:
         i = 0
         for currency in currencies_list.currencies:
             i = i + 1
-            if i > 9:
+            if i > 10:
                 continue
             currency_name = str(currency.currency_name)
             response = self.getCoinData({"coin_id": currency_name})
