@@ -62,11 +62,7 @@ class CoinGeckoRequester:
         CurrencyTypeMsg = currency_pb2.CurrencyTypeMsg(type=currency_type_pb2.CURRENCY_TYPE_CRYPTO)
         currencies_list = currency_stub.GetSupportedCurrencies(CurrencyTypeMsg)
         coin_prices = {}
-        i = 0
         for currency in currencies_list.currencies:
-            i = i + 1
-            if i > 10:
-                continue
             currency_name = str(currency.currency_name)
             response = self.getCoinData({"coin_id": currency_name})
             if "error" in response is not None:
