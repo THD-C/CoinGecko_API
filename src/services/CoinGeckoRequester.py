@@ -1,11 +1,12 @@
 import requests
 from opentelemetry.instrumentation.requests import RequestsInstrumentor
 from dotenv import load_dotenv
-
+import asyncio
 from secret.secret_pb2 import SecretName
 from src.connections import secret_stub
 from currency import currency_pb2, currency_type_pb2
 from src.connections import currency_stub
+from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
 
@@ -59,15 +60,29 @@ class CoinGeckoRequester:
         return self.request(url, params)
 
     def getAllCoinPrices(self):
+        coin_prices = {}
         CurrencyTypeMsg = currency_pb2.CurrencyTypeMsg(type=currency_type_pb2.CURRENCY_TYPE_CRYPTO)
         currencies_list = currency_stub.GetSupportedCurrencies(CurrencyTypeMsg)
-        coin_prices = {}
-        for currency in currencies_list.currencies:
-            currency_name = str(currency.currency_name)
-            response = self.getCoinData({"coin_id": currency_name})
+
+        with ThreadPoolExecutor() as executor:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+            tasks = [
+                loop.run_in_executor(
+                    executor,
+                    lambda currency_name=currency.currency_name: self.getCoinData({"coin_id": str(currency_name)})
+                )
+                for currency in currencies_list.currencies
+            ]
+
+            responses = loop.run_until_complete(asyncio.gather(*tasks))
+            loop.close()
+
+        for response in responses:
             if "error" in response is not None:
                 return {"error": f"F{response.error}"}
-            coin_prices[currency_name] = response['data']['market_data']['current_price']
+            coin_prices[response['data']['id']] = response['data']['market_data']['current_price']
         return {"data": coin_prices}
 
     def request(self, url, params):
