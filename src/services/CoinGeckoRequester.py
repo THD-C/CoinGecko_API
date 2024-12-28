@@ -9,17 +9,22 @@ from src.connections import currency_stub
 from concurrent.futures import ThreadPoolExecutor
 
 load_dotenv()
-
 RequestsInstrumentor().instrument()
+
 
 
 class CoinGeckoRequester:
     _instance = None
+    cache = None
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super(CoinGeckoRequester, cls).__new__(cls, *args, **kwargs)
+            cls._instance = super().__new__(cls)
         return cls._instance
+
+    def __init__(self, cache):
+        if self.cache is None:
+            self.cache = cache
 
     url = "https://api.coingecko.com/api/v3/coins/"
 
@@ -29,6 +34,9 @@ class CoinGeckoRequester:
 
     def getCoinData(self, inputData):
         coin_id = inputData["coin_id"]
+        cached = self.cache.getFromCache("getCoinData", inputData)
+        if cached != 0:
+            return cached
 
         url = f"{self.url}/{coin_id}"
 
@@ -40,8 +48,9 @@ class CoinGeckoRequester:
             "developer_data": "false",
             "sparkline": "false",
         }
-
-        return self.request(url, params)
+        response = self.request(url, params)
+        self.cache.addToCache("getCoinData", inputData, response)
+        return response
 
     def getHistoricalChartData(self, inputData):
         start_timestamp = inputData["start_date"].ToSeconds()
@@ -84,6 +93,9 @@ class CoinGeckoRequester:
                 return {"error": f"F{response.error}"}
             coin_prices[response['data']['id']] = response['data']['market_data']['current_price']
         return {"data": coin_prices}
+
+    def getAllCoinsData(self):
+        return
 
     def request(self, url, params):
         try:

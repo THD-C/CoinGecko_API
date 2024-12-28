@@ -11,7 +11,11 @@ from py_grpc_prometheus.prometheus_server_interceptor import PromServerIntercept
 from prometheus_client import start_http_server
 
 from src.utils.OpenTelemetry.config import SERVICE_NAME
+from src.services.Cache import Cache
+from src.services.CoinGeckoRequester import CoinGeckoRequester
 
+cache = Cache()
+requester = CoinGeckoRequester(cache)
 
 def serve():
     GrpcInstrumentorServer().instrument()
@@ -24,7 +28,7 @@ def serve():
     health_pb2_grpc.add_HealthServicer_to_server(health_servicer, server)
     health_servicer.set(SERVICE_NAME, health_pb2.HealthCheckResponse.SERVING)
     
-    coins.coins_pb2_grpc.add_CoinsServicer_to_server(CoinsService(), server)
+    coins.coins_pb2_grpc.add_CoinsServicer_to_server(CoinsService(requester), server)
 
     # Enable reflection
     SERVICE_NAMES = (

@@ -2,7 +2,6 @@ from google.protobuf import struct_pb2
 
 import coins.coins_pb2
 import coins.coins_pb2_grpc
-from src.services.CoinGeckoRequester import CoinGeckoRequester
 import asyncio
 
 from currency import currency_pb2, currency_type_pb2
@@ -10,10 +9,13 @@ from src.connections import currency_stub
 from concurrent.futures import ThreadPoolExecutor
 
 
-requester = CoinGeckoRequester()
+
 
 
 class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
+    requester = None
+    def __init__(self, requester):
+        self.requester = requester
     def GetCoinData(self, request, context):
         print(f"Received coin data request for coin_id: {request.coin_id}")
 
@@ -22,7 +24,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
             "fiat_currency": request.fiat_currency
         }
 
-        requesterResponse = requester.getCoinData(inputData)
+        requesterResponse = self.requester.getCoinData(inputData)
 
         if "error" in requesterResponse:
             response = coins.coins_pb2.DataResponse(
@@ -31,7 +33,6 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
                 data=""
             )
         else:
-            print("fiat currency:", inputData["fiat_currency"])
             formatted_data = {
                 "id": requesterResponse['data']['id'],
                 "symbol": requesterResponse['data']['symbol'],
@@ -64,7 +65,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
             "fiat_currency": request.fiat_currency
         }
 
-        requesterResponse = requester.getHistoricalChartData(inputData)
+        requesterResponse = self.requester.getHistoricalChartData(inputData)
 
         if "error" in requesterResponse is not None:
             response = coins.coins_pb2.DataResponse(
@@ -90,7 +91,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
         return response
 
     def GetAllCoinsPrices(self, request, context):
-        requesterResponse = requester.getAllCoinPrices()
+        requesterResponse = self.requester.getAllCoinPrices()
 
         if "error" in requesterResponse:
             response = coins.coins_pb2.DataResponse(
@@ -123,7 +124,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
             tasks = [
                 loop.run_in_executor(
                     executor,
-                    lambda currency_name=currency.currency_name: requester.getCoinData({"coin_id": str(currency_name)})
+                    lambda currency_name=currency.currency_name: self.requester.getCoinData({"coin_id": str(currency_name)})
                 )
                 for currency in currencies_list.currencies
             ]
