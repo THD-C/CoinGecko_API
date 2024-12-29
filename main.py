@@ -17,6 +17,7 @@ from src.services.CoinGeckoRequester import CoinGeckoRequester
 cache = Cache()
 requester = CoinGeckoRequester(cache)
 
+
 def serve():
     GrpcInstrumentorServer().instrument()
     server = grpc.server(
