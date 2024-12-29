@@ -2,20 +2,17 @@ from google.protobuf import struct_pb2
 
 import coins.coins_pb2
 import coins.coins_pb2_grpc
-import asyncio
 
 from currency import currency_pb2, currency_type_pb2
 from src.connections import currency_stub
-from concurrent.futures import ThreadPoolExecutor
-
-
-
 
 
 class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
     requester = None
+
     def __init__(self, requester):
         self.requester = requester
+
     def GetCoinData(self, request, context):
         print(f"Received coin data request for coin_id: {request.coin_id}")
 

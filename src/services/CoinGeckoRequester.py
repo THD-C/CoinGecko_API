@@ -12,7 +12,6 @@ load_dotenv()
 RequestsInstrumentor().instrument()
 
 
-
 class CoinGeckoRequester:
     _instance = None
     cache = None
