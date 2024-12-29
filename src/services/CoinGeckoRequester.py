@@ -57,6 +57,11 @@ class CoinGeckoRequester:
         coin_id = inputData["coin_id"]
         fiat_currency = inputData["fiat_currency"]
 
+        cached = self.cache.getFromCache("getHistoricalChartData", inputData)
+        if cached != 0:
+            print('historical from cache')
+            return cached
+
         url = f"{self.url}/{coin_id}/market_chart/range"
 
         params = {
@@ -64,8 +69,9 @@ class CoinGeckoRequester:
             "from": start_timestamp,
             "to": end_timestamp
         }
-
-        return self.request(url, params)
+        response = self.request(url, params)
+        self.cache.addToCache("getHistoricalChartData", response, inputData)
+        return response
 
     def getAllCoinsData(self):
         cached = self.cache.getFromCache("getAllCoinsData")
