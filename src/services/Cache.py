@@ -63,14 +63,15 @@ class Cache:
     def addToCache(self, function, response, request=None):
         current_timestamp = int(time.time())
 
-        if "error" in response is not None:
-            return
-
         if function == "getCoinData":
+            if "error" in response is not None:
+                return
             self.cache[function][request["coin_id"]] = {}
             self.cache[function][request["coin_id"]]['timestamp'] = current_timestamp
             self.cache[function][request["coin_id"]]['data'] = response
         elif function == "getHistoricalChartData":
+            if "error" in response is not None:
+                return
             start_timestamp = request["start_date"].ToSeconds()
             end_timestamp = request["end_date"].ToSeconds()
             coin_id = request["coin_id"]
@@ -89,6 +90,10 @@ class Cache:
             self.cache[function][coin_id][start_timestamp][end_timestamp][fiat_currency]['data'] = response
             return
         elif function == "getAllCoinsData":
+            for responseeeeeXDDDD in response:
+                if "error" in responseeeeeXDDDD:
+                    return
+
             self.cache[function] = {}
             self.cache[function]['timestamp'] = current_timestamp
             self.cache[function]['data'] = response
