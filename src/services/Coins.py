@@ -93,8 +93,6 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
 
         fiat_currencies_list = currency_stub.GetSupportedCurrencies(currency_pb2.CurrencyTypeMsg(type=currency_type_pb2.CURRENCY_TYPE_FIAT))
 
-        print("fiats: ", fiat_currencies_list)
-
         responses = self.requester.getAllCoinsData()
 
         for response in responses:
@@ -104,8 +102,6 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
             coin_prices[response['data']['id']] = {}
             for fiat_coin in fiat_currencies_list.currencies:
                 coin_prices[response['data']['id']][fiat_coin.currency_name] = response['data']['market_data']['current_price'][fiat_coin.currency_name]
-
-        print("coin_prices: ", coin_prices)
 
         if error_flag != 0:
             response = coins.coins_pb2.DataResponse(

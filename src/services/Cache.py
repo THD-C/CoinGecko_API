@@ -24,14 +24,11 @@ class Cache:
         if function == "getCoinData":
             try:
                 if current_timestamp < self.GETCOINDATA_TTL+self.cache['getCoinData'][request['coin_id']]['timestamp']:
-                    print("getting from cache")
                     return self.cache['getCoinData'][request['coin_id']]['data']
                 else:
-                    print("time to lose, removing...")
                     self.removeFromCache(function, request)
                     return 0
             except KeyError:
-                print("no entry found in cache")
                 return 0
         elif function == "getHistoricalChartData":
             if self.cache['getHistoricalChartData'][request.coin_id]['timestamp'] < current_timestamp + self.GETCOINDATA_TTL:
@@ -52,14 +49,12 @@ class Cache:
         current_timestamp = int(time.time())
 
         if "error" in response is not None:
-            print("we don't cache errors here")
             return
 
         if function == "getCoinData":
             self.cache['getCoinData'][request["coin_id"]] = {}
             self.cache['getCoinData'][request["coin_id"]]['timestamp'] = current_timestamp
             self.cache['getCoinData'][request["coin_id"]]['data'] = response
-            print("added to cache")
         elif function == "getHistoricalChartData":
             return
         elif function == "getAllCoinPrices":
@@ -70,7 +65,6 @@ class Cache:
     def removeFromCache(self, function, request):
         if function == "getCoinData":
             self.cache['getCoinData'].pop(request["coin_id"])
-            print("removing from cache")
         elif function == "getHistoricalChartData":
             return 1
         elif function == "getAllCoinPrices":
