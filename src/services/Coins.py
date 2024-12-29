@@ -91,17 +91,33 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
         return response
 
     def GetAllCoinsPrices(self, request, context):
-        requesterResponse = self.requester.getAllCoinPrices()
+        coin_prices = {}
+        error_flag = 0
 
-        if "error" in requesterResponse:
+        fiat_currencies_list = currency_stub.GetSupportedCurrencies(currency_pb2.CurrencyTypeMsg(type=currency_type_pb2.CURRENCY_TYPE_FIAT))
+
+        print("fiats: ", fiat_currencies_list)
+
+        responses = self.requester.getAllCoinsData()
+
+        for response in responses:
+            if "error" in response:
+                error_flag += 1
+                continue
+            coin_prices[response['data']['id']] = {}
+            for fiat_coin in fiat_currencies_list.currencies:
+                coin_prices[response['data']['id']][fiat_coin.currency_name] = response['data']['market_data']['current_price'][fiat_coin.currency_name]
+
+        print("coin_prices: ", coin_prices)
+
+        if error_flag != 0:
             response = coins.coins_pb2.DataResponse(
                 status="error",
-                error_message=requesterResponse['error'],
+                error_message=f"Couldn't fetch data for {error_flag} currencies",
                 data=""
             )
         else:
-            formatted_data = requesterResponse['data']
-            print(formatted_data)
+            formatted_data = coin_prices
             response = coins.coins_pb2.DataResponse(
                 status="success",
                 error_message="",
@@ -113,24 +129,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
         coinsList = {}
         error_flag = 0
 
-        currencies_list = currency_stub.GetSupportedCurrencies(
-            currency_pb2.CurrencyTypeMsg(type=currency_type_pb2.CURRENCY_TYPE_CRYPTO)
-        )
-
-        with ThreadPoolExecutor() as executor:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-            tasks = [
-                loop.run_in_executor(
-                    executor,
-                    lambda currency_name=currency.currency_name: self.requester.getCoinData({"coin_id": str(currency_name)})
-                )
-                for currency in currencies_list.currencies
-            ]
-
-            responses = loop.run_until_complete(asyncio.gather(*tasks))
-            loop.close()
+        responses = self.requester.getAllCoinsData()
 
         for response in responses:
             if "error" in response:

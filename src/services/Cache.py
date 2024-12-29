@@ -52,6 +52,7 @@ class Cache:
         current_timestamp = int(time.time())
 
         if "error" in response is not None:
+            print("we don't cache errors here")
             return
 
         if function == "getCoinData":

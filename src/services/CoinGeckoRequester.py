@@ -69,10 +69,10 @@ class CoinGeckoRequester:
         return self.request(url, params)
 
     def getAllCoinPrices(self):
-        coin_prices = {}
-        CurrencyTypeMsg = currency_pb2.CurrencyTypeMsg(type=currency_type_pb2.CURRENCY_TYPE_CRYPTO)
-        currencies_list = currency_stub.GetSupportedCurrencies(CurrencyTypeMsg)
+        return
 
+    def getAllCoinsData(self):
+        crypto_currencies_list = currency_stub.GetSupportedCurrencies(currency_pb2.CurrencyTypeMsg(type=currency_type_pb2.CURRENCY_TYPE_CRYPTO))
         with ThreadPoolExecutor() as executor:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
@@ -80,22 +80,15 @@ class CoinGeckoRequester:
             tasks = [
                 loop.run_in_executor(
                     executor,
-                    lambda currency_name=currency.currency_name: self.getCoinData({"coin_id": str(currency_name)})
+                    lambda currency_name=currency.currency_name: self.getCoinData(
+                        {"coin_id": str(currency_name)})
                 )
-                for currency in currencies_list.currencies
+                for currency in crypto_currencies_list.currencies
             ]
 
             responses = loop.run_until_complete(asyncio.gather(*tasks))
             loop.close()
-
-        for response in responses:
-            if "error" in response is not None:
-                return {"error": f"F{response.error}"}
-            coin_prices[response['data']['id']] = response['data']['market_data']['current_price']
-        return {"data": coin_prices}
-
-    def getAllCoinsData(self):
-        return
+        return responses
 
     def request(self, url, params):
         try:
