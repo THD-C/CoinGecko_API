@@ -48,7 +48,7 @@ class CoinGeckoRequester:
             "sparkline": "false",
         }
         response = self.request(url, params)
-        self.cache.addToCache("getCoinData", inputData, response)
+        self.cache.addToCache("getCoinData", response, inputData)
         return response
 
     def getHistoricalChartData(self, inputData):
@@ -67,10 +67,11 @@ class CoinGeckoRequester:
 
         return self.request(url, params)
 
-    def getAllCoinPrices(self):
-        return
-
     def getAllCoinsData(self):
+        cached = self.cache.getFromCache("getAllCoinsData")
+        if cached != 0:
+            return cached
+
         crypto_currencies_list = currency_stub.GetSupportedCurrencies(currency_pb2.CurrencyTypeMsg(type=currency_type_pb2.CURRENCY_TYPE_CRYPTO))
         with ThreadPoolExecutor() as executor:
             loop = asyncio.new_event_loop()
@@ -87,6 +88,7 @@ class CoinGeckoRequester:
 
             responses = loop.run_until_complete(asyncio.gather(*tasks))
             loop.close()
+        self.cache.addToCache("getAllCoinsData", responses)
         return responses
 
     def request(self, url, params):
