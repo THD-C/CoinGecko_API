@@ -1,13 +1,10 @@
 import time
 
+from src.utils import GETCOINDATA_TTL, GETHISTORICALCHARTDATA_TTL, GETALLCOINPRICES_TTL, CACHE_TTL
+
 
 class Cache:
     _instance = None
-
-    GETCOINDATA_TTL = 60*2
-    GETHISTORICALCHARTDATA_TTL = 60*60*24
-    GETALLCOINPRICES_TTL = 60*5
-    CACHE_TTL = 60*60*24
 
     cache = {
         "getCoinData": {},
@@ -27,7 +24,7 @@ class Cache:
         current_timestamp = int(time.time())
         if function == "getCoinData":
             try:
-                if current_timestamp < self.GETCOINDATA_TTL+self.cache[function][request['coin_id']]['timestamp']:
+                if current_timestamp < GETCOINDATA_TTL+self.cache[function][request['coin_id']]['timestamp']:
                     return self.cache[function][request['coin_id']]['data']
                 else:
                     self.removeFromCache(function, request)
@@ -41,7 +38,7 @@ class Cache:
                 coin_id = request["coin_id"]
                 fiat_currency = request["fiat_currency"]
 
-                if current_timestamp < self.GETHISTORICALCHARTDATA_TTL + self.cache[function][coin_id][start_timestamp][end_timestamp][fiat_currency]['timestamp']:
+                if current_timestamp < GETHISTORICALCHARTDATA_TTL + self.cache[function][coin_id][start_timestamp][end_timestamp][fiat_currency]['timestamp']:
                     return self.cache[function][coin_id][start_timestamp][end_timestamp][fiat_currency]['data']
                 else:
                     self.removeFromCache(function, request)
@@ -50,7 +47,7 @@ class Cache:
                 return 0
         elif function == "getAllCoinsData":
             try:
-                if current_timestamp < self.GETALLCOINPRICES_TTL + self.cache[function]['timestamp']:
+                if current_timestamp < GETALLCOINPRICES_TTL + self.cache[function]['timestamp']:
                     return self.cache[function]['data']
                 else:
                     self.removeFromCache(function, request)
@@ -119,7 +116,7 @@ class Cache:
 
     def cacheCheckAndCleanup(self):
         current_timestamp = int(time.time())
-        if current_timestamp > self.CACHE_TTL + self.creationTime:
+        if current_timestamp > CACHE_TTL + self.creationTime:
             self.cache = {
                 "getCoinData": {},
                 "getHistoricalChartData": {},
