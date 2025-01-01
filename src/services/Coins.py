@@ -27,7 +27,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
             response = coins.coins_pb2.DataResponse(
                 status="error",
                 error_message=requesterResponse['error'],
-                data=""
+                data={}
             )
         else:
             formatted_data = {
@@ -68,7 +68,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
             response = coins.coins_pb2.DataResponse(
                 status="error",
                 error_message=requesterResponse['error'],
-                data=""
+                data={}
             )
         else:
             formatted_data = {
@@ -79,6 +79,46 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
             for timestamp, price in requesterResponse['data']['prices']:
                 formatted_data["timestamp"].append(timestamp)
                 formatted_data["price"].append(price)
+
+            response = coins.coins_pb2.DataResponse(
+                status="success",
+                error_message="",
+                data=formatted_data
+            )
+        return response
+
+    def GetHistoricalCandleData(self, request, context):
+        print(f"Received historical candle data request for coin_id: {request.coin_id}")
+
+        inputData = {
+            "coin_id": request.coin_id,
+            "start_date": request.start_date,
+            "end_date": request.end_date,
+            "fiat_currency": request.fiat_currency
+        }
+
+        requesterResponse = self.requester.getHistoricalCandleChartData(inputData)
+
+        if 'error' in requesterResponse is not None:
+            response = coins.coins_pb2.DataResponse(
+                status="error",
+                error_message=requesterResponse['error'],
+                data={}
+            )
+        else:
+            formatted_data = {
+                "timestamp": [],
+                "open": [],
+                "high": [],
+                "low": [],
+                "close": []
+            }
+            for timestamp, openVar, high, low, close in requesterResponse['data']:
+                formatted_data["timestamp"].append(timestamp)
+                formatted_data["open"].append(openVar)
+                formatted_data["high"].append(high)
+                formatted_data["low"].append(low)
+                formatted_data["close"].append(close)
 
             response = coins.coins_pb2.DataResponse(
                 status="success",
@@ -107,7 +147,7 @@ class CoinsService(coins.coins_pb2_grpc.CoinsServicer):
             response = coins.coins_pb2.DataResponse(
                 status="error",
                 error_message=f"Couldn't fetch data for {error_flag} currencies",
-                data=""
+                data={}
             )
         else:
             formatted_data = coin_prices
