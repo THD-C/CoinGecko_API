@@ -82,12 +82,10 @@ class CoinGeckoRequester:
 
         cached = self.cache.getFromCache("getHistoricalCandleChartData", inputData)
         if cached != 0:
-            print('historical from cache')
+            print('historical candle from cache')
             return cached
 
         url = f"{self.url}/{coin_id}/ohlc"
-
-        print("number of days", numberOfDays)
 
         params = {
             "vs_currency": fiat_currency,
@@ -96,7 +94,6 @@ class CoinGeckoRequester:
 
         response = self.request(url, params)
         self.cache.addToCache("getHistoricalCandleChartData", response, inputData)
-        print(response)
         return response
 
     def getAllCoinsData(self):
